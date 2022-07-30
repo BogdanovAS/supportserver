@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Задать новый вопрос{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+    <div">
+        <p>{{ user.username }}!</p>
+        <p><a href="{% url 'logout' %}">Выйти</a></p>
+    </div>
+    <div>
+
+        <form action="{% url 'new_question' user.id %}" method="POST">
+            
+            {% csrf_token %}
+            
+            <textarea name="themequestion" required="" placeholder="Тема вопроса" cols="40" rows="1"></textarea><br>
+
+            <textarea name="textquestion" required="" placeholder="Текст вопроса" cols="40" rows="3"></textarea><br>
+    
+            <button type="submit">Задать вопрос</button>
+    
+        </form>
+    
+    </div>
+    {% else %}
+    
+        <a href="{% url 'login' %}">Войти</a><br>
+
+    {% endif %}
+
+{% endblock %}

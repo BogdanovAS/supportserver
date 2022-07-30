@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}{{question.question_text}}{% endblock %}
+
+{% block content %}
+
+    <h2>{{question.question_text}}</h2>
+    
+    <p>{{question.question_theme}}</p>
+
+    <em>{{question.author_name}}&nbsp{{question.pub_date}}</em>
+    
+    {% if user.is_authenticated %}
+    
+        {% if user.username == question.author_name.username %}
+
+            <form action="{% url 'deletequestion' question.id %}" method="POST">
+        
+                {% csrf_token %}
+    
+                <button type="submit">Удалить</button>
+    
+            </form>
+
+        {% endif %}
+
+    {% endif %}
+
+    <hr>
+
+        {% if comments_list %}
+
+            {% for c in comments_list %}
+                <p>
+                    <strong>{{c.author_name}}</strong>
+                    <p>{{c.comment_text}}&nbsp{{c.pub_date}}</p>
+
+                    {% if user.is_authenticated %}
+
+                        {% if user.username == c.author_name.username %}
+    
+                            <form action="{% url 'deletecomment' c.id question.id%}" method="POST">
+        
+                                {% csrf_token %}
+
+                                <button type="submit">Удалить</button>
+
+                            </form>
+                
+                        {% endif %}
+
+                    {% endif %}
+                </p>
+
+            {% endfor %}
+
+        {% else %}
+            Будьте первым!
+        {% endif %}
+
+    <hr>
+    
+    {% if user.is_authenticated %}
+    
+    <form action="{% url 'leave_comment' question.id user.id %}" method="POST">
+        
+        {% csrf_token %}
+
+        <textarea name="text" required="" placeholder="Текст комментария" cols="30" rows="10"></textarea><br>
+
+        <button type="submit">Ответить</button>
+
+    </form>
+
+    {% else %}
+    
+        <a href="{% url 'login' %}">Войти</a><br>
+
+    {% endif %}
+
+{% endblock %}

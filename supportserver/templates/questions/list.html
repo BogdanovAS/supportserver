@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Вопросы{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+    <div class = "container head_div_right">
+        <p>{{ user.username }}!</p>
+        <p><a href="{% url 'page_for_new_question' %}">Задать вопрос</a></p>
+        <p><a href="{% url 'logout' %}">Выйти</a></p>
+    </div>
+    {% else %}
+    
+        <a href="{% url 'login' %}">Войти&nbsp</a><a href="{% url 'signup' %}">Зарегистрироваться&nbsp</a><br>
+
+    {% endif %}
+
+    {% if question_list %}
+
+        {% for a in question_list %}
+            <a href="{% url 'PageWithQuestion' a.id %}">{{a.question_text}}&nbsp</a>
+            <strong><a>{{a.question_theme}}&nbsp</a></strong>
+            <a>{{a.author_name}}&nbsp</a>
+            <a>{{a.pub_date}}&nbsp</a>
+            <br>
+        {% endfor %}
+
+    {% else %}
+        Вопросы не найдены
+    {% endif %}
+
+{% endblock %}
