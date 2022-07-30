@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}{{question.question_text}}{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}  
+    
+        {% if user.username == question.author_name.username %}
+
+            <h2>{{question.question_text}}</h2>
+    
+            <p>{{question.question_theme}}</p>
+
+            {% if question.status == True %}
+
+                <em>{{question.author_name}}&nbsp{{question.pub_date}}&nbsp<font color = "green">Вопрос Решен!</font></em> 
+
+                <form action="{% url 'statusOfQuestion' question.id %}" method="POST">
+        
+                    {% csrf_token %}
+        
+                    <button type="submit">Не решенный</button>
+        
+                </form>
+
+            {% else %}
+
+                <em>{{question.author_name}}&nbsp{{question.pub_date}}</em>
+
+                <form action="{% url 'statusOfQuestion' question.id %}" method="POST">
+                
+                    {% csrf_token %}
+        
+                    <button type="submit">Решенный</button>
+        
+                </form>
+            {% endif %}
+        
+            <form action="{% url 'deletequestion' question.id %}" method="POST">
+        
+                {% csrf_token %}
+    
+                <button type="submit">Удалить</button>
+    
+            </form>
+
+        {% else %}
+
+            <h2>{{question.question_text}}</h2>
+        
+            <p>{{question.question_theme}}</p>
+
+            {% if question.status == True %}
+
+                <em>{{question.author_name}}&nbsp{{question.pub_date}}&nbsp<font color = "green">Вопрос Решен!</font></em>    
+            
+            {% else %}
+
+                <em>{{question.author_name}}&nbsp{{question.pub_date}}</em>
+
+            {% endif %}
+    
+        {% endif %}
+
+    {% else %}
+
+        <h2>{{question.question_text}}</h2>
+    
+        <p>{{question.question_theme}}</p>
+
+        {% if question.status == True %}
+
+            <em>{{question.author_name}}&nbsp{{question.pub_date}}&nbsp<font color = "green">Вопрос Решен!</font></em>    
+    
+        {% else %}
+
+            <em>{{question.author_name}}&nbsp{{question.pub_date}}</em>
+
+        {% endif %}
+
+    {% endif %}
+
+    <hr>
+
+        {% if comments_list %}
+
+            {% for c in comments_list %}
+                <p>
+                    <strong>{{c.author_name}}</strong>
+
+                    {% if c.status == True %}
+
+                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}&nbsp<font color = "green">Решение</font></p>
+
+                    {% else %}
+
+                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}</p>
+
+                    {% endif %}
+                    
+                    {% if user.is_authenticated %}
+
+                        {% if user.username == question.author_name.username %}
+
+                            {% if c.status == True %}
+
+                                <form action="{% url 'statusOfComment' c.id question.id %}" method="POST">
+                
+                                    {% csrf_token %}
+                        
+                                    <button type="submit">Не верно</button>
+                            
+                                </form>
+                            
+                            {% else %}
+
+                                <form action="{% url 'statusOfComment' c.id question.id %}" method="POST">
+                    
+                                    {% csrf_token %}
+                        
+                                    <button type="submit">Верно</button>
+                            
+                                </form>
+
+                            {% endif %}
+
+                        {% endif %}
+
+                        {% if user.username == c.author_name.username %}
+    
+                            <form action="{% url 'deletecomment' c.id question.id%}" method="POST">
+        
+                                {% csrf_token %}
+
+                                <button type="submit">Удалить</button>
+
+                            </form>
+                
+                        {% endif %}
+
+                    {% else %}
+
+                    {% endif %}
+                </p>
+
+            {% endfor %}
+
+        {% else %}
+            Будьте первым!
+        {% endif %}
+
+    <hr>
+    
+    {% if user.is_authenticated %}
+    
+    <form action="{% url 'leave_comment' question.id user.id %}" method="POST">
+        
+        {% csrf_token %}
+
+        <textarea name="text" required="" placeholder="Текст комментария" cols="30" rows="10"></textarea><br>
+
+        <button type="submit">Ответить</button>
+
+    </form>
+
+    {% else %}
+    
+        <a href="{% url 'login' %}">Войти</a><br>
+
+    {% endif %}
+
+    <form action="{% url 'PageWithQuestions' %}" method="POST">
+        
+        {% csrf_token %}
+
+        <button type="submit">На главную</button>
+
+    </form>
+
+{% endblock %}
