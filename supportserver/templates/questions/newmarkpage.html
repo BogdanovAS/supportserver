@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}{% endblock %}
+
+{% block content%}
+
+    <p>Поставьте отзыв от 1 до 5 целым числом:</p>
+
+    <form action="{% url 'newmark' comment.id question.id %}" method="POST">
+        
+        {% csrf_token %}
+
+        <textarea name="mark" required="" cols="7" rows="1"></textarea><br>
+
+        <button type="submit">Оценить</button>
+
+    </form>
+
+
+{% endblock %}

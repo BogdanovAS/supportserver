@@ -91,15 +91,27 @@
 
                     {% if c.status == True %}
 
-                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}&nbsp<font color = "green">Решение</font></p>
+                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}&nbspРейтинг:{{c.rating}}&nbsp<font color = "green">Решение</font></p>
 
                     {% else %}
 
-                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}</p>
+                        <p>{{c.comment_text}}&nbsp{{c.pub_date}}&nbspРейтинг:{{c.rating}}</p>
 
                     {% endif %}
                     
                     {% if user.is_authenticated %}
+
+                        {% if user.username != c.author_name.username %}
+
+                            <form action="{% url 'newmarkpage' c.id question.id %}" method="POST">
+                    
+                                {% csrf_token %}
+                    
+                                <button type="submit">Оставить оценку</button>
+                        
+                            </form>
+
+                        {% endif %}
 
                         {% if user.username == question.author_name.username %}
 
@@ -128,6 +140,18 @@
                         {% endif %}
 
                         {% if user.username == c.author_name.username %}
+                            
+                            {% if c.actualtimecheck == True %}
+
+                                <form action="{% url 'newoldcomment' c.id question.id %}" method="POST">
+                    
+                                    {% csrf_token %}
+                        
+                                    <button type="submit">Редактировать</button>
+                            
+                                </form>
+                            
+                            {% endif %}
     
                             <form action="{% url 'deletecomment' c.id question.id%}" method="POST">
         

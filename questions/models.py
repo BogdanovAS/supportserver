@@ -27,7 +27,8 @@ class Comment(models.Model):
     comment_text = models.CharField('Содержание комментария', max_length = 500)
     pub_date = models.DateTimeField('Дата публикации')
     status = models.BooleanField(default = False)
-    rating = models.IntegerField('Рейтинг комментария', default = 0)
+    rating = models.FloatField('Рейтинг комментария', default = 0.0)
+    marks = models.BooleanField(default = False)
 
     class Meta:
         verbose_name = 'Комментарий'
@@ -36,5 +37,9 @@ class Comment(models.Model):
     def __str__(self):
         return self.author_name
 
-    def check_bublic_time(self):
-        return self.pubdate >= (timezone.now() - datetime.timedelta(days = 1))
+    def actualtimeckeck(self):
+        if pub_date >= (timezone.now() - datetime.timedelta(hours=1)):
+            answer = False
+        else:
+            answer = True
+        return answer

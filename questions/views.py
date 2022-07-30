@@ -1,6 +1,9 @@
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 
+from django.core.exceptions import PermissionDenied
+
+
 from django.contrib.auth.models import User
 
 from django.utils import timezone
@@ -110,3 +113,56 @@ def statusOfComment(request, comment_id, question_id):
     
     comments_list = b.comment_set.order_by('pub_date')
     return HttpResponseRedirect( reverse('PageWithQuestion', args = (b.id,)) )
+
+def newmarkpage(request, comment_id, question_id):
+    try:
+        a = Comment.objects.get( id = comment_id )
+        b = Question.objects.get( id = question_id )
+    except:
+        raise Http404("Комментарий не найден!")
+    return render(request, 'questions/newmarkpage.html', {'question': b, 'comment': a})
+
+def newmark(request, comment_id, question_id):
+    try:
+        a = Comment.objects.get( id = comment_id )
+        b = Question.objects.get( id = question_id )
+    except:
+        raise PermissionDenied()
+    
+    if len(request.POST['mark']) != 1 or int(request.POST['mark']) < 1 or int(request.POST['mark']) > 5:
+        raise PermissionDenied()
+
+    if a.marks == False:
+        a.rating = request.POST['mark']
+        a.marks = True
+    else:
+        a.rating = round((a.rating + int(request.POST['mark']))/2, 1)
+    
+    a.save()
+
+    comments_list = b.comment_set.order_by('pub_date')
+    return HttpResponseRedirect( reverse('PageWithQuestion', args = (b.id,)) )
+
+def newoldcommentpage(request, comment_id, question_id):
+    try:
+        a = Comment.objects.get( id = comment_id )
+        b = Question.objects.get( id = question_id )
+    except:
+        raise Http404("Комментарий не найден!")
+    return render(request, 'questions/newoldcomment.html', {'question': b, 'comment': a})
+
+def newoldcomment(request, comment_id, question_id):
+    try:
+        a = Comment.objects.get( id = comment_id )
+        b = Question.objects.get( id = question_id )
+
+    except:
+        raise Http404("Комментарий не найден!")
+
+    if a.pub_date <= (timezone.now() - a.pub_date):
+        a.comment_text = request.POST['text']
+        a.save()
+    else:
+        raise PermissionDenied()
+    comments_list = b.comment_set.order_by('pub_date')
+    return render(request, 'questions/question.html', {'question': b, 'comments_list': comments_list})
