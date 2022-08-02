@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% endblock %}
+{% block title %}Редактирование комментария{% endblock %}
 
 {% block content%}
 
@@ -10,7 +10,7 @@
         
         {% csrf_token %}
 
-        <textarea name="text" required="" cols="40" rows="10"></textarea><br>
+        <textarea name="textcomment" required="" placeholder="Текст комментария" cols="40" rows="10"></textarea><br>
 
         <button type="submit">Заменить</button>
 

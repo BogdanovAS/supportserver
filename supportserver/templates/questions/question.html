@@ -12,6 +12,7 @@
     
             <p>{{question.question_theme}}</p>
 
+
             {% if question.status == True %}
 
                 <em>{{question.author_name}}&nbsp{{question.pub_date}}&nbsp<font color = "green">Вопрос Решен!</font></em> 
@@ -36,7 +37,15 @@
         
                 </form>
             {% endif %}
-        
+            
+            <form action="{% url 'newoldquestionpage' question.id %}" method="POST">
+                                    
+                {% csrf_token %}
+    
+                <button type="submit">Редактировать</button>
+            
+            </form>
+
             <form action="{% url 'deletequestion' question.id %}" method="POST">
         
                 {% csrf_token %}
@@ -141,10 +150,9 @@
 
                         {% if user.username == c.author_name.username %}
                             
-                            {% if c.actualtimecheck == True %}
-
-                                <form action="{% url 'newoldcomment' c.id question.id %}" method="POST">
-                    
+                            {% if c.actualtimeckeck %}
+                                <form action="{% url 'newoldcommentpage' c.id question.id %}" method="POST">
+                                    
                                     {% csrf_token %}
                         
                                     <button type="submit">Редактировать</button>

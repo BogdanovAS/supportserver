@@ -9,7 +9,10 @@ urlpatterns = [
     path('questionslist/new_question', views.page_for_new_question, name='page_for_new_question'),
     path('questionslist/<int:question_id>-<int:user_id>/leave_comment', views.leave_comment, name='leave_comment'),
     path('questionslist/<int:question_id>/deletequestion', views.delete_the_question, name='deletequestion'),
-    path('questionslist/<int:comment_id>-<int:question_id>/newoldcomment/', views.newoldcomment, name='newoldcomment'),
+    path('questionslist/<int:question_id>/newoldquestionpage/newoldquestion', views.newoldquestion, name='newoldquestion'),
+    path('questionslist/<int:question_id>/newoldquestionpage/', views.newoldquestionpage, name='newoldquestionpage'),
+    path('questionslist/<int:comment_id>-<int:question_id>/newoldcommentpage/newoldcomment', views.newoldcomment, name='newoldcomment'),
+    path('questionslist/<int:comment_id>-<int:question_id>/newoldcommentpage/', views.newoldcommentpage, name='newoldcommentpage'),
     path('questionslist/<int:comment_id>-<int:question_id>/newmarkpage/newmark', views.newmark, name='newmark'),
     path('questionslist/<int:comment_id>-<int:question_id>/newmarkpage', views.newmarkpage, name='newmarkpage'),
     path('questionslist/<int:comment_id>-<int:question_id>/deletecomment', views.delete_the_comment, name='deletecomment'),
@@ -18,5 +21,5 @@ urlpatterns = [
     path('questionslist/<int:question_id>/', views.question, name='PageWithQuestion'),
     re_path(r'^questionslist', views.questionslist, name='PageWithQuestions'),
     path('admin/', admin.site.urls),
-    path('', views.index, name='StartPage'),
+    path('', views.questionslist, name='StartPage'),
 ]

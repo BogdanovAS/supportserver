@@ -38,8 +38,4 @@ class Comment(models.Model):
         return self.author_name
 
     def actualtimeckeck(self):
-        if pub_date >= (timezone.now() - datetime.timedelta(hours=1)):
-            answer = False
-        else:
-            answer = True
-        return answer
+        return self.pub_date >= (timezone.now() - datetime.timedelta(hours = 1))

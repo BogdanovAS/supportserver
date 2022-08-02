@@ -14,14 +14,12 @@ from .models import Question, Comment
 
 import datetime
 
-def index(request):
-    return render(request, 'questions/list.html')
 
-def questionslist(request):
-    question_list = Question.objects.order_by('-pub_date')[:2]
+def questionslist(request):                 #отображение списка вопросов
+    question_list = Question.objects.order_by('-pub_date')
     return render(request, 'questions/list.html', {'question_list': question_list})
 
-def question(request, question_id):
+def question(request, question_id):                 #отображение вопроса
     try:
         a = Question.objects.get( id = question_id )
     except:
@@ -31,7 +29,7 @@ def question(request, question_id):
     
     return render(request, 'questions/question.html', {'question': a, 'comments_list': comments_list})
 
-def leave_comment(request, question_id, user_id):
+def leave_comment(request, question_id, user_id):                 #оставить комментарий
     try:
         a = Question.objects.get( id = question_id )
         b = User.objects.get(id = user_id)
@@ -43,11 +41,11 @@ def leave_comment(request, question_id, user_id):
     
     return HttpResponseRedirect( reverse('PageWithQuestion', args = (a.id,)) )
 
-def page_for_new_question(request):
+def page_for_new_question(request):                 #форма для нового вопроса
     return render(request, 'questions/pagefornewquestion.html')
 
 
-def new_question(request, user_id):
+def new_question(request, user_id):                 #задать новый вопрос
     try:
         b = User.objects.get(id = user_id)
     except:
@@ -61,7 +59,7 @@ def new_question(request, user_id):
     
     return render(request, 'questions/question.html', {'question': My_question, 'comments_list': comments_list})
 
-def delete_the_question(request, question_id):
+def delete_the_question(request, question_id):                 #удалить вопрос
     try:
         a = Question.objects.get( id = question_id )
         a.delete()
@@ -71,7 +69,7 @@ def delete_the_question(request, question_id):
     question_list = Question.objects.order_by('-pub_date')
     return render(request, 'questions/list.html', {'question_list': question_list})
 
-def delete_the_comment(request, comment_id, question_id):
+def delete_the_comment(request, comment_id, question_id):                 #удалить комментарий
     try:
         a = Question.objects.get( id = question_id )
         b = Comment.objects.get( id = comment_id )
@@ -85,7 +83,7 @@ def delete_the_comment(request, comment_id, question_id):
     
     return render(request, 'questions/question.html', {'question': a, 'comments_list': comments_list})
 
-def statusOfQuestion(request, question_id):
+def statusOfQuestion(request, question_id):                 #метка для вопроса(получен верный ответ или нет)
     try:
         a = Question.objects.get( id = question_id )
         if a.status == False:
@@ -99,12 +97,14 @@ def statusOfQuestion(request, question_id):
     comments_list = a.comment_set.order_by('pub_date')
     return render(request, 'questions/question.html', {'question': a, 'comments_list': comments_list})
 
-def statusOfComment(request, comment_id, question_id):
+def statusOfComment(request, comment_id, question_id):                 #метка для ответа(является ответ верным или нет)
     try:
         a = Comment.objects.get( id = comment_id )
         b = Question.objects.get( id = question_id )
         if a.status == False:
             a.status = True
+            b.status = True
+            b.save()
         else:
             a.status = False
         a.save()
@@ -114,7 +114,7 @@ def statusOfComment(request, comment_id, question_id):
     comments_list = b.comment_set.order_by('pub_date')
     return HttpResponseRedirect( reverse('PageWithQuestion', args = (b.id,)) )
 
-def newmarkpage(request, comment_id, question_id):
+def newmarkpage(request, comment_id, question_id):                 #форма для оценки ответа(рейтинг)
     try:
         a = Comment.objects.get( id = comment_id )
         b = Question.objects.get( id = question_id )
@@ -122,7 +122,7 @@ def newmarkpage(request, comment_id, question_id):
         raise Http404("Комментарий не найден!")
     return render(request, 'questions/newmarkpage.html', {'question': b, 'comment': a})
 
-def newmark(request, comment_id, question_id):
+def newmark(request, comment_id, question_id):                 #оценка ответа(рейтинг)
     try:
         a = Comment.objects.get( id = comment_id )
         b = Question.objects.get( id = question_id )
@@ -143,7 +143,7 @@ def newmark(request, comment_id, question_id):
     comments_list = b.comment_set.order_by('pub_date')
     return HttpResponseRedirect( reverse('PageWithQuestion', args = (b.id,)) )
 
-def newoldcommentpage(request, comment_id, question_id):
+def newoldcommentpage(request, comment_id, question_id):                 #страница для редактирования комментария
     try:
         a = Comment.objects.get( id = comment_id )
         b = Question.objects.get( id = question_id )
@@ -151,7 +151,7 @@ def newoldcommentpage(request, comment_id, question_id):
         raise Http404("Комментарий не найден!")
     return render(request, 'questions/newoldcomment.html', {'question': b, 'comment': a})
 
-def newoldcomment(request, comment_id, question_id):
+def newoldcomment(request, comment_id, question_id):                 #редактирование комментария
     try:
         a = Comment.objects.get( id = comment_id )
         b = Question.objects.get( id = question_id )
@@ -159,10 +159,30 @@ def newoldcomment(request, comment_id, question_id):
     except:
         raise Http404("Комментарий не найден!")
 
-    if a.pub_date <= (timezone.now() - a.pub_date):
-        a.comment_text = request.POST['text']
-        a.save()
-    else:
-        raise PermissionDenied()
+
+    a.comment_text = request.POST['textcomment']
+    a.save()
+    
+    comments_list = b.comment_set.order_by('pub_date')
+    return render(request, 'questions/question.html', {'question': b, 'comments_list': comments_list})
+
+def newoldquestionpage(request, question_id):                 #страница для редактирования вопроса
+    try:
+        b = Question.objects.get( id = question_id )
+    except:
+        raise Http404("Вопрос не найден!")
+    return render(request, 'questions/newoldquestion.html', {'question': b})
+
+def newoldquestion(request, question_id):                 #редактирование вопроса
+    try:
+        b = Question.objects.get( id = question_id )
+
+    except:
+        raise Http404("Вопрос не найден!")
+
+
+    b.question_text = request.POST['textquestion']
+    b.save()
+    
     comments_list = b.comment_set.order_by('pub_date')
     return render(request, 'questions/question.html', {'question': b, 'comments_list': comments_list})
